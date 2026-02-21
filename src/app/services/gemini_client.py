@@ -4,6 +4,13 @@ from app.config import CONFIG
 from app.logger import logger
 from app.utils.browser import get_cookie_from_browser
 
+# --- Integration Placeholders for Optimization/Expansion ---
+# langchain: Could wrap Gemini client for use in chains
+# haystack: Could use Gemini as a retriever/generator
+# celery/redis: Could offload Gemini calls to background tasks
+# openai: Could wrap Gemini to mimic OpenAI API
+# playwright: Could automate Gemini web UI if needed
+
 # Import the specific exception to handle it gracefully
 from gemini_webapi.exceptions import AuthError
 

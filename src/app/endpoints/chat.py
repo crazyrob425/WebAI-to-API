@@ -6,6 +6,13 @@ from schemas.request import GeminiRequest, OpenAIChatRequest
 from app.services.gemini_client import get_gemini_client, GeminiClientNotInitializedError
 from app.services.session_manager import get_translate_session_manager
 
+# --- Integration Placeholders for Optimization/Expansion ---
+# langchain: Add endpoints for chain-based chat/QA
+# haystack: Add endpoints for semantic search/RAG
+# celery/redis: Offload chat completions to background tasks
+# openai: Enhance OpenAI endpoint compatibility
+# playwright: Add endpoints for browser-based LLM automation
+
 router = APIRouter()
 
 @router.post("/translate")

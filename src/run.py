@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 import uvicorn
+import subprocess
 import multiprocessing
 import time
 import sys
@@ -11,6 +12,13 @@ import signal
 from typing import Dict, Union, Tuple
 from fastapi.routing import APIRoute
 from typing import TYPE_CHECKING
+
+# --- Integration Placeholders for Optimization/Expansion ---
+# langchain: For advanced LLM workflow orchestration (future integration)
+# haystack: For RAG, semantic search, and QA (future integration)
+# celery/redis: For background task processing and caching (future integration)
+# openai: For OpenAI API compatibility and client (future integration)
+# playwright: For browser automation (future integration)
 
 # This block is only processed by type checkers like Pylance
 if TYPE_CHECKING:
@@ -71,29 +79,47 @@ def get_app_info() -> Tuple[str, str]:
 # --- UNIFIED Server Runner Functions ---
 
 
+
 def start_webai_server(
-    host: str, port: int, reload: bool, stop_event: "MultiprocessingEvent"
+    host: str, port: int, reload: bool, stop_event: "MultiprocessingEvent", production: bool = False
 ):
-    """Starts the WebAI Uvicorn server with a graceful shutdown mechanism."""
+    """Starts the WebAI server with Uvicorn (dev) or Gunicorn+Uvicorn (prod) and graceful shutdown."""
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    config = uvicorn.Config(
-        webai_app, host=host, port=port, reload=reload, log_config=None
-    )
-    server = uvicorn.Server(config)
+    if production:
+        # Use Gunicorn with Uvicorn workers for robust production serving
+        print_server_info(host, port, "webai")
+        print("\n[WebAI Server] Starting with Gunicorn (production mode)...")
+        # Gunicorn command for production
+        cmd = [
+            sys.executable, '-m', 'gunicorn',
+            'app.main:app',
+            '-k', 'uvicorn.workers.UvicornWorker',
+            '-b', f'{host}:{port}',
+            '--workers', '2',
+            '--timeout', '120',
+            '--log-level', 'info',
+        ]
+        subprocess.run(cmd)
+        print(f"\n[WebAI Server] Gunicorn process exited.")
+    else:
+        config = uvicorn.Config(
+            webai_app, host=host, port=port, reload=reload, log_config=None
+        )
+        server = uvicorn.Server(config)
 
-    def shutdown_monitor():
-        stop_event.wait()
-        server.should_exit = True
+        def shutdown_monitor():
+            stop_event.wait()
+            server.should_exit = True
 
-    monitor_thread = threading.Thread(target=shutdown_monitor, daemon=True)
-    monitor_thread.start()
+        monitor_thread = threading.Thread(target=shutdown_monitor, daemon=True)
+        monitor_thread.start()
 
-    print_server_info(host, port, "webai")
-    server.run()
-    print(f"\n[WebAI Server] Process exited gracefully.")
+        print_server_info(host, port, "webai")
+        server.run()
+        print(f"\n[WebAI Server] Process exited gracefully.")
 
 
 def start_g4f_server(host: str, port: int, stop_event: "MultiprocessingEvent"):

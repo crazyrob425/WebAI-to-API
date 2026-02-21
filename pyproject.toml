@@ -22,6 +22,19 @@ httpx = ">=0.28.1,<0.29.0"
 curl-cffi = ">=0.7.4,<0.15.0"
 gemini-webapi = ">=1.8.3,<2.0.0"
 uvicorn = {extras = ["standard"], version = ">=0.34.0,<0.41.0"}
+# --- Added for optimization and feature expansion ---
+# Advanced LLM workflow orchestration
+langchain = "^0.1.16"
+# Retrieval-augmented generation, semantic search, QA
+haystack-ai = "^2.0.0"
+# Background task processing
+celery = "^5.3.6"
+# In-memory cache and broker for Celery
+redis = "^5.0.3"
+# OpenAI API compatibility (for reference and client)
+openai = "^1.13.3"
+# Headless browser automation
+playwright = "^1.43.0"
 
 # Windows-specific dependencies for cookie decryption
 # These will only be installed on Windows systems
@@ -34,6 +47,8 @@ aiohttp-socks = "^0.11.0"
 nodriver = "^0.48.1"
 platformdirs = "^4.3.8"
 
+# For local development and testing of async servers
+gunicorn = "^21.2.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
